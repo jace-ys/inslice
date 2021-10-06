@@ -1,8 +1,17 @@
 [package]
 name = "slice"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = "3.0.0-beta.4"
+
+[[bin]]
+name = "colslc"
+path = "src/bin/colslc/main.rs"
+
+[[bin]]
+name = "rowslc"
+path = "src/bin/rowslc/main.rs"

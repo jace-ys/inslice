@@ -86,4 +86,180 @@ impl<R: BufRead> RowSlicer<R> {
 }
 
 #[cfg(test)]
-mod test {}
+mod test {
+    use super::*;
+    use std::str::FromStr;
+
+    fn testdata() -> File {
+        File::open("src/testdata/input.txt").unwrap()
+    }
+
+    fn execute(filters: Vec<Filter>, expected: &str) -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn rowslc_slice_exact_ok() -> Result<(), Box<dyn Error>> {
+        let filters = vec![Filter::from_str("1")?];
+        let expected = "\
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+";
+
+        execute(filters, expected)
+    }
+
+    #[test]
+    fn rowslc_slice_exact_multiple_ok() -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let filters = vec![Filter::from_str("1")?, Filter::from_str("3")?];
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        let expected = "\
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+redis        6.2-alpine    6960a2858b36   3 days ago      31.3MB
+";
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn rowslc_slice_range_ok() -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let filters = vec![Filter::from_str("1:3")?];
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        let expected = "\
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+vault        1.8.4         dc15db720d79   2 days ago      186MB
+redis        6.2-alpine    6960a2858b36   3 days ago      31.3MB
+";
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn rowslc_slice_range_multiple_ok() -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let filters = vec![Filter::from_str("1:2")?, Filter::from_str("4:5")?];
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        let expected = "\
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+vault        1.8.4         dc15db720d79   2 days ago      186MB
+postgres     14.0-alpine   ae192c4d3ada   17 months ago   152MB
+traefik      2.5           72bfc37343a4   18 months ago   68.9MB";
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn rowslc_slice_exact_and_range_ok() -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let filters = vec![Filter::from_str("1")?, Filter::from_str("3:4")?];
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        let expected = "\
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+redis        6.2-alpine    6960a2858b36   3 days ago      31.3MB
+postgres     14.0-alpine   ae192c4d3ada   17 months ago   152MB
+";
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn rowslc_slice_range_start_ok() -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let filters = vec![Filter::from_str("3:")?];
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        let expected = "\
+redis        6.2-alpine    6960a2858b36   3 days ago      31.3MB
+postgres     14.0-alpine   ae192c4d3ada   17 months ago   152MB
+traefik      2.5           72bfc37343a4   18 months ago   68.9MB";
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn rowslc_slice_range_end_ok() -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let filters = vec![Filter::from_str(":3")?];
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        let expected = "\
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+vault        1.8.4         dc15db720d79   2 days ago      186MB
+redis        6.2-alpine    6960a2858b36   3 days ago      31.3MB
+";
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn rowslc_slice_range_full_ok() -> Result<(), Box<dyn Error>> {
+        let mut writer = Vec::new();
+
+        let filters = vec![Filter::from_str(":")?];
+        let mut slicer = RowSlicer {
+            reader: BufReader::new(testdata()),
+            filters: FilterSet::new(filters),
+        };
+
+        let expected = "\
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+vault        1.8.4         dc15db720d79   2 days ago      186MB
+redis        6.2-alpine    6960a2858b36   3 days ago      31.3MB
+postgres     14.0-alpine   ae192c4d3ada   17 months ago   152MB
+traefik      2.5           72bfc37343a4   18 months ago   68.9MB";
+
+        slicer.slice(&mut writer)?;
+        assert_eq!(String::from_utf8(writer)?, expected);
+        Ok(())
+    }
+}

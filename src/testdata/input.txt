@@ -1,0 +1,5 @@
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
+vault        1.8.4         dc15db720d79   2 days ago      186MB
+redis        6.2-alpine    6960a2858b36   3 days ago      31.3MB
+postgres     14.0-alpine   ae192c4d3ada   17 months ago   152MB
+traefik      2.5           72bfc37343a4   18 months ago   68.9MB

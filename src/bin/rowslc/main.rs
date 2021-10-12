@@ -5,7 +5,7 @@ use std::process;
 
 use clap::Clap;
 
-use slice::filter::{Filter, FilterSet};
+use slices::filter::{Filter, FilterSet};
 
 #[derive(Clap)]
 #[clap(

@@ -7,6 +7,7 @@ use clap::Clap;
 
 use slices::filter::{Filter, FilterSet};
 
+/// A command-line utility for filtering input text by rows and writing them to standard output
 #[derive(Clap)]
 #[clap(
     name = "rowslc",
@@ -14,11 +15,30 @@ use slices::filter::{Filter, FilterSet};
     author = "Jace Tan <jaceys.tan@gmail.com>"
 )]
 struct Opts {
-    /// Path to input file
-    filepath: Option<String>,
+    /// Path to input file. To read from standard input, specify - as the path. If no path is
+    /// provided, the default behaviour will be to read from standard input.
+    path: Option<String>,
 
+    /// Filters to be applied, using row indexes to denote which rows from the input text should
+    /// be retained. Multiple filters can be applied, the result of which is their union. The
+    /// following are accepted formats for filters, with row indexing starting from one,
+    /// beginning from the top-most row:
+    ///
+    /// * [n] - an exact filter for selecting the n'th row
+    ///
+    /// * [n:m] - a range-based filter for selecting the n'th to m'th (inclusive) rows
+    ///     
+    /// * [n:] - a range-based filter for selecting the n'th to last (inclusive) rows
+    ///     
+    /// * [:n] - a range-based filter for selecting the first to n'th (inclusive) rows
+    ///     
+    /// * [:n] - a range-based filter for selecting the first to last (inclusive) rows
+    ///
+    /// Example:
+    ///
+    /// `rowslc - -f 1 4:6` will result in the 1st, 4th, 5th, and 6th rows of the input text
+    /// provided from standard input being written to standard output, separated by a newline.
     #[clap(short, long)]
-    /// Filters to be applied
     filters: Vec<Filter>,
 }
 
@@ -32,7 +52,7 @@ fn main() {
 fn run() -> Result<(), Box<dyn Error>> {
     let opts: Opts = Opts::parse();
 
-    let reader: Box<dyn BufRead> = match opts.filepath.as_deref() {
+    let reader: Box<dyn BufRead> = match opts.path.as_deref() {
         Some("-") => Box::new(BufReader::new(io::stdin())),
         Some(input) => {
             let file = File::open(input)

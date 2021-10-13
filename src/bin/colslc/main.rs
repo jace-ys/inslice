@@ -7,6 +7,7 @@ use clap::Clap;
 
 use slices::filter::{Filter, FilterSet};
 
+/// A command-line utility for filtering input text by columns and writing them to standard output
 #[derive(Clap)]
 #[clap(
     name = "colslc",
@@ -14,12 +15,36 @@ use slices::filter::{Filter, FilterSet};
     author = "Jace Tan <jaceys.tan@gmail.com>"
 )]
 struct Opts {
-    /// Path to input file
-    filepath: Option<String>,
+    /// Path to input file. To read from standard input, specify - as the path. If no path is
+    /// provided, the default behaviour will be to read from standard input.
+    path: Option<String>,
 
+    /// Filters to be applied, using column indexes to denote which columns from the input text
+    /// should be retained. Multiple filters can be applied, the result of which is their union.
+    /// The following are accepted formats for filters, with column indexing starting from one,
+    /// beginning from the left-most column:
+    ///
+    /// * [n] - an exact filter for selecting the n'th column
+    ///
+    /// * [n:m] - a range-based filter for selecting the n'th to m'th (inclusive) columns
+    ///     
+    /// * [n:] - a range-based filter for selecting the n'th to last (inclusive) columns
+    ///     
+    /// * [:n] - a range-based filter for selecting the first to n'th (inclusive) columns
+    ///     
+    /// * [:n] - a range-based filter for selecting the first to last (inclusive) columns
+    ///
+    /// Example:
+    ///
+    /// `colslc - -f 1 4:6` will result in the 1st, 4th, 5th, and 6th columns of the input text
+    /// provided from standard input being written to standard output, separated by whitespace.
     #[clap(short, long)]
-    /// Filters to be applied
     filters: Vec<Filter>,
+
+    /// Optional delimiter to use for splitting input text into columns. If no delimiter is provided, the
+    /// default behaviour will be to split by any amount of whitespace.
+    #[clap(short, long)]
+    delimiter: Option<String>,
 }
 
 fn main() {
@@ -32,7 +57,7 @@ fn main() {
 fn run() -> Result<(), Box<dyn Error>> {
     let opts: Opts = Opts::parse();
 
-    let reader: Box<dyn BufRead> = match opts.filepath.as_deref() {
+    let reader: Box<dyn BufRead> = match opts.path.as_deref() {
         Some("-") => Box::new(BufReader::new(io::stdin())),
         Some(input) => {
             let file = File::open(input)
@@ -46,6 +71,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     let mut slicer = ColSlicer {
         reader,
         filters: FilterSet::new(opts.filters),
+        delimiter: opts.delimiter,
     };
 
     slicer
@@ -58,6 +84,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 struct ColSlicer<R: BufRead> {
     reader: R,
     filters: FilterSet,
+    delimiter: Option<String>,
 }
 
 impl<R: BufRead> ColSlicer<R> {
@@ -71,14 +98,19 @@ impl<R: BufRead> ColSlicer<R> {
                     if self.filters.is_empty() {
                         write!(writer, "{}", buf)?;
                     } else {
-                        let columns: Vec<&str> = buf
-                            .split_whitespace()
+                        let columns: Vec<&str> = match &self.delimiter {
+                            Some(d) => buf.split(d).collect(),
+                            None => buf.split_whitespace().collect(),
+                        };
+
+                        let extracted: Vec<&str> = columns
+                            .into_iter()
                             .enumerate()
                             .filter(|&(index, _)| self.filters.apply(1 + index as u32))
-                            .map(|(_, col)| col)
+                            .map(|(_, col)| col.trim_end())
                             .collect();
 
-                        writeln!(writer, "{}", columns.join(" "))?;
+                        writeln!(writer, "{}", extracted.join(" "))?;
                     }
 
                     buf.clear();
@@ -109,6 +141,7 @@ mod test {
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\
@@ -132,6 +165,7 @@ traefik
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\
@@ -155,6 +189,7 @@ traefik 72bfc37343a4
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\
@@ -178,6 +213,7 @@ traefik 2.5 72bfc37343a4
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\
@@ -201,6 +237,7 @@ traefik 2.5 18 months
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\
@@ -224,6 +261,7 @@ traefik 72bfc37343a4 18
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\
@@ -247,6 +285,7 @@ ae192c4d3ada 17 months ago 152MB
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\
@@ -270,6 +309,7 @@ traefik 2.5 72bfc37343a4
         let mut slicer = ColSlicer {
             reader: BufReader::new(testdata()),
             filters: FilterSet::new(filters),
+            delimiter: None,
         };
 
         let expected = "\

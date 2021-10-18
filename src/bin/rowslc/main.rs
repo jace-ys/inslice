@@ -19,7 +19,7 @@ struct Opts {
     /// provided, the default behaviour will be to read from standard input.
     path: Option<String>,
 
-    /// Filters to be applied, using row indexes to denote which rows from the input text should
+    /// Filters to be applied, using row numbers to denote which rows from the input text should
     /// be retained. Multiple filters can be applied, the result of which is their union. The
     /// following are accepted formats for filters, with row indexing starting from one,
     /// beginning from the top-most row:

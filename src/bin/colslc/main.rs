@@ -19,7 +19,7 @@ struct Opts {
     /// provided, the default behaviour will be to read from standard input.
     path: Option<String>,
 
-    /// Filters to be applied, using column indexes to denote which columns from the input text
+    /// Filters to be applied, using column numbers to denote which columns from the input text
     /// should be retained. Multiple filters can be applied, the result of which is their union.
     /// The following are accepted formats for filters, with column indexing starting from one,
     /// beginning from the left-most column:

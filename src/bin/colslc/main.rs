@@ -11,7 +11,7 @@ use inslice::filter::{Filter, FilterSet};
 #[derive(Parser)]
 #[clap(
     name = "colslc",
-    version = "1.0.0",
+    version = "1.1.0",
     author = "Jace Tan <jaceys.tan@gmail.com>"
 )]
 struct Opts {

@@ -1,6 +1,6 @@
 [package]
 name = "inslice"
-version = "1.0.1"
+version = "1.1.0"
 authors = ["jace-ys <jaceys.tan@gmail.com>"]
 edition = "2018"
 description = "A command-line utility for filtering text input by columns and rows"

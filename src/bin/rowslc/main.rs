@@ -3,12 +3,12 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::process;
 
-use clap::Clap;
+use clap::Parser;
 
 use inslice::filter::{Filter, FilterSet};
 
 /// A command-line utility for filtering input text by rows and writing them to standard output
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(
     name = "rowslc",
     version = "1.0.0",

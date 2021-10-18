@@ -1,6 +1,6 @@
 [package]
 name = "inslice"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["jace-ys <jaceys.tan@gmail.com>"]
 edition = "2018"
 description = "A command-line utility for filtering text input by columns and rows"
@@ -22,4 +22,4 @@ name = "rowslc"
 path = "src/bin/rowslc/main.rs"
 
 [dependencies]
-clap = "3.0.0-beta.4"
+clap = "3.0.0-beta.5"

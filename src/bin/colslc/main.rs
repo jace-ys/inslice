@@ -5,7 +5,7 @@ use std::process;
 
 use clap::Clap;
 
-use slices::filter::{Filter, FilterSet};
+use inslice::filter::{Filter, FilterSet};
 
 /// A command-line utility for filtering input text by columns and writing them to standard output
 #[derive(Clap)]

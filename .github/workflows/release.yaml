@@ -20,14 +20,14 @@ jobs:
 
             #### Pre-Built Binaries
 
-            Pre-built `colslc` and `rowslc` binaries compiled for various target platforms can be found under the [Releases](https://github.com/jace-ys/slices/releases) section of this repository.
+            Pre-built `colslc` and `rowslc` binaries compiled for various target platforms can be found under the [Releases](https://github.com/jace-ys/inslice/releases) section of this repository.
 
             #### Cargo
 
             To install `colslc` and `rowslc` using the `cargo` toolchain:
 
             ```shell
-            cargo install slices
+            cargo install inslice --version ${{ steps.tag.outputs.VERSION }}
             ```
           files: |
             README.md
@@ -45,13 +45,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           bin: colslc
-          archive: $bin-$tag-$target
+          archive: inslice-$bin-$tag-$target
       - uses: taiki-e/upload-rust-binary-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           bin: rowslc
-          archive: $bin-$tag-$target
+          archive: inslice-$bin-$tag-$target
 
   cratesio-publish:
     runs-on: ubuntu-20.04
@@ -63,8 +63,8 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ./target
-          key: ${{ runner.os }}-slices-${{ hashFiles('Cargo.toml') }}
-          restore-keys: ${{ runner.os }}-slices-
+          key: ${{ runner.os }}-inslice-${{ hashFiles('Cargo.toml') }}
+          restore-keys: ${{ runner.os }}-inslice-
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal

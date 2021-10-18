@@ -1,10 +1,11 @@
-[![ci](https://github.com/jace-ys/slices/workflows/ci/badge.svg)](https://github.com/jace-ys/slices/actions?query=workflow%3Aci)
+[![ci](https://github.com/jace-ys/inslice/workflows/ci/badge.svg)](https://github.com/jace-ys/inslice/actions?query=workflow%3Aci)
+[![release](https://github.com/jace-ys/inslice/workflows/release/badge.svg)](https://github.com/jace-ys/inslice/actions?query=workflow%3Arelease)
 
-# `slices`
+# `inslice`
 
 Extracting specific columns and rows from a chunk of text is a common task one needs to do in the command-line, whether it's from files or standard input. However, current ways of doing so, such as `awk` or `tail`, are not the most straightforward or intuitive, especially since they typically require special syntax or invocations to achieve the task at hand.
 
-`slices` is a command-line utility written in Rust that aims to address this problem, by allowing one to easily filter input text by columns and rows in a literal and explicit manner using column and row numbers. It is made up of two separate binaries, `colslc` and `rowslc`, that operate on columns and rows respectively, and can be used in conjunction to achieve the desired output. This follows the Unix philosophy of writing programs that do one thing and do it well, and that work together.
+`inslice` is a command-line utility written in Rust that aims to address this problem, by allowing one to easily filter input text by columns and rows in a literal and explicit manner using column and row numbers. It is made up of two separate binaries, `colslc` and `rowslc`, that operate on columns and rows respectively, and can be used in conjunction to achieve the desired output. This follows the Unix philosophy of writing programs that do one thing and do it well, and that work together.
 
 To draw similarities to existing equivalent commands, see [Comparisons](#comparisons).
 
@@ -12,14 +13,14 @@ To draw similarities to existing equivalent commands, see [Comparisons](#compari
 
 #### Pre-Built Binaries
 
-Pre-built `colslc` and `rowslc` binaries compiled for various target platforms can be found under the [Releases](https://github.com/jace-ys/slices/releases) section of this repository.
+Pre-built `colslc` and `rowslc` binaries compiled for various target platforms can be found under the [Releases](https://github.com/jace-ys/inslice/releases) section of this repository.
 
 #### Cargo
 
 To install `colslc` and `rowslc` using the `cargo` toolchain:
 
 ```shell
-cargo install slices
+cargo install inslice
 ```
 
 ## Usage

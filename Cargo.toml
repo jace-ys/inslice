@@ -1,12 +1,12 @@
 [package]
-name = "slices"
+name = "inslice"
 version = "1.0.0"
 authors = ["jace-ys <jaceys.tan@gmail.com>"]
 edition = "2018"
 description = "A command-line utility for filtering text input by columns and rows"
 readme = "README.md"
-homepage = "https://github.com/jace-ys/slices"
-repository = "https://github.com/jace-ys/slices"
+homepage = "https://github.com/jace-ys/inslice"
+repository = "https://github.com/jace-ys/inslice"
 license = "MIT"
 keywords = []
 categories = ["command-line-utilities", "text-processing"]

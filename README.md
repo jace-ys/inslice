@@ -160,7 +160,7 @@ cat src/testdata/input.txt | head -3
 
 is equivalent to 
 
-```
+```shell
 cat src/testdata/input.txt | rowslc -f :3
 ```
 
@@ -172,7 +172,7 @@ cat src/testdata/input.txt | tail +3
 
 is equivalent to 
 
-```
+```shell
 cat src/testdata/input.txt | rowslc -f 3:
 ```
 
@@ -184,7 +184,7 @@ cat src/testdata/input.txt | head -3 | tail +3
 
 is equivalent to 
 
-```
+```shell
 cat src/testdata/input.txt | rowslc -f 3
 ```
 
